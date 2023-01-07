@@ -1,0 +1,186 @@
+﻿@page "{Id}"
+@model QuestRoom.Pages.RoomInfoModel
+@{
+
+}
+
+<style>
+    
+
+    .carousel-indicators [data-bs-target] {
+        box-sizing: content-box;
+        flex: 0 1 auto;
+        width: 100px;
+        height: 75px;
+        padding: 0;
+        margin-right: 3px;
+        margin-left: 3px;
+        text-indent: -999px;
+        cursor: pointer;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        /*transition: opacity 0.6s ease;*/
+    }
+
+    .mini-image{
+        width: 100px;
+        height: 75px;
+    }
+
+    .carousel-indicators>.active{
+        border:2px solid white;
+    }
+
+    .carousel-item>img{
+        width:100%;
+        height:90vh;
+    }
+
+    .title{
+        z-index:1;
+    }
+    
+</style>
+
+<div class="container">
+    <div id="carouselExampleIndicators" class="carousel slide position-relative">
+        <div class="position-absolute top-0 left-0 title p-5">
+            <h1 class="text-white fw-bolder mb-5">@Model.Room?.Name.Replace("_"," ") (@Model.Room?.Company)</h1>
+            @for (int i = 0; i < Model.Room?.Rating; i++)
+            {
+                <img src="~/Files/Images/star.png" width="30px"/>
+            }
+        </div>
+        <div class="carousel-indicators">
+            @{
+                var index = 0;
+                var count = 1;
+
+                foreach (var image in Model.Images)
+                {
+                    if (index == 0)
+                    {
+                        <img class="active" type="button"
+                 data-bs-target="#carouselExampleIndicators"
+                 data-bs-slide-to="@index" aria-current="true" aria-label="Slide @count"
+                 src="~/Files/@Model.Room?.Name/@image.Path" />
+
+                    }
+                    else
+                    {
+                        <img type="button" data-bs-target="#carouselExampleIndicators"
+                 data-bs-slide-to="@index" aria-label="Slide @count"
+                 src="~/Files/@Model.Room?.Name/@image.Path" />
+
+
+                    }
+
+                    index++;
+                    count++;
+                }
+            }
+
+        </div>
+        <div class="carousel-inner">
+
+            @{
+                index = 0;
+
+                foreach (var image in Model.Images)
+                {
+                    if (index == 0)
+                    {
+                        <div class="carousel-item active">
+                            <img src="~/Files/@Model.Room?.Name/@image.Path" class="d-block w-100" alt="...">
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="carousel-item">
+                            <img src="~/Files/@Model.Room?.Name/@image.Path" class="d-block w-100" alt="...">
+                        </div>
+                    }
+
+                    index++;
+                }
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+
+
+    <div class="row mt-5">
+        <img class="col-md-3 col-xl-4 h-50" src="~/Files/@Model.Room?.Name/@Model.Room?.LogoPath" />
+        <div class="d-flex flex-column gap-2 align-items-start justify-content-between col-md-8 col-xl-6 text-white">
+            <div>
+                <span class="text-danger fw-bold">Описание:</span>
+                <span class="text-white">@Model.Room?.Description</span>
+            </div>
+
+            <div>
+                <span class="text-danger wf-bold">Адрес:</span>
+                <span class="text-white">@Model.Room?.Address</span>
+            </div>
+
+            <div>
+                <span class="text-danger wf-bold">Уровень страха:</span>
+                @for (int i = 0; i < Model.Room?.Scary; i++)
+                {
+                    <img width="15px" src="~/Files/Images/star.png" />
+                }
+            </div>
+
+            <div>
+                <span class="text-danger wf-bold">Уровень сложности:</span>
+                @for (int i = 0; i < Model.Room?.Complexity; i++)
+                {
+                    <img width="15px" src="~/Files/Images/star.png" />
+                }
+            </div>
+
+            <div>
+                <span class="text-danger wf-bold">Время прохождения:</span>
+                <span class="text-white">@Model.Room?.Time мин.</span>
+            </div>
+
+            <div>
+                <span class="text-danger wf-bold">Минимальный возраст игроков:</span>
+                <span class="text-white">@Model.Room?.MinAge</span>
+            </div>
+
+            <div>
+                <span class="text-danger wf-bold">Количетво игроков игроков:</span>
+                <span class="text-white">@Model.Room?.MinPLayers - @Model.Room?.MaxPLayers</span>
+            </div>
+
+            <div>
+                <span class="text-danger wf-bold">E-Mail:</span>
+                <span class="text-white">@Model.Room?.Mail</span>
+            </div>
+
+            <div>
+                <span class="text-danger wf-bold">Контакты:</span>
+                @{
+                    var phones = Model.context?.Phones.Where(p => p.RoomId == Model.Room.Id);
+                }
+                @foreach (var phone in phones)
+                {
+                    <span class="me-1">@phone.Number</span>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+

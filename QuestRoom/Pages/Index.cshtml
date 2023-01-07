@@ -1,0 +1,359 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
+    body {
+        background-color: #292929;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: 2rem;
+    }
+
+    .image-block {
+        width: 100%;
+        height:auto;
+        position:relative;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
+
+    .room-image {
+        width: 100%;
+        height:300px;
+    }
+
+    .image{
+        width:100%;
+    }
+
+    
+
+    a {
+        
+        text-decoration: none;
+    }
+
+
+    .description {
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: white;
+        background-color: rgba(0,0,0,0.7);
+        font-size: 1rem;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content:center;
+        width: 100%;
+        height: 100%;
+    }
+
+    
+        
+    .room-info {
+        width: 100%;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        background-color: #212121;
+    }
+
+    .room-name {
+        font-size: 2rem;
+        font-family: Impact,fantasy;
+    }
+
+    .room-rating {
+        display: flex;
+    }
+
+    .mini-image {
+        width: 15px;
+    }
+
+    .gray-text{
+        color:gray;
+        font-size:15px;
+    }
+
+    .details{
+        width:100%;
+        display:flex;
+        justify-content:space-between;
+        align-items:end;
+    }
+
+    .details-info{
+        display:flex;
+        flex-direction:column;
+        color:white;
+        font-family:Elephant;
+        font-size:20px;
+        align-items:start;
+    }
+
+    .detail-button{
+        background-color:#212121;
+        width:60%;
+        height:40px;
+        border-radius:5px;
+        border:1px solid white;
+        color:white;
+    }
+
+    .detail-button:hover{
+        border:1px solid red;
+        background-color:red;
+    }
+
+    .filter-block{
+        background-color:#212121;
+        height:100%;
+        width:240px;
+        border:1px solid black;
+        z-index:10;
+        display:none;
+    }
+
+    .toggle-button{
+        
+    }
+
+    .control-button{
+        margin:10px;
+        font-size:30px;
+        border:3px solid black;
+        border-radius:10px;
+        background-color:#212121;
+        color:white;
+        width:1.5em;
+    }
+
+    .fixed{
+        position:fixed;
+        top:0;
+        left:0;
+    }
+
+    .form{
+        display:none;
+    }
+
+    
+
+    .active{
+        border-color:white;
+    }
+
+    .shadow{
+        opacity:0.4;
+        background-color: #9ABAB1;
+        z-index:3;
+        min-width:100vw;
+        min-height:100vh;
+        display:none;
+    }
+
+    .under{
+        z-index:2;
+    }
+
+    .find-button{
+        width:100px;
+    }
+
+    .flex{
+        display:flex;
+        justify-content:space-between;
+    }
+
+</style>
+
+<div class="filter-block fixed">
+    <div class="flex">
+
+        <div>
+            <a asp-page="/Index">
+                <button class="control-button">
+                    <span>&#8634;</span>
+                </button>
+            </a>
+        </div>
+
+        <div class="text-end">
+            <button class="toggle-button control-button">
+                <span>&#9776;</span>
+            </button>
+        </div>
+    </div>
+    
+
+    <div class="mt-5">
+        <form class="text-white m-3" method="post">
+            <label class="form">Сортировать по:</label>
+
+            <div class="form">
+                <input type="radio" asp-for="filter" value="complexity" id="complexity"/>
+                
+                <label for="complexity">По сложности</label>
+            </div>
+
+            <div class="form">
+                <input type="radio" asp-for="filter" value="players" id="players" />
+                
+                <label for="players">По количеству игроков</label>
+            </div>
+
+            <div class="form">
+                <input type="radio" asp-for="filter" value="scary" id="scary" />
+
+                <label for="scary">По уровню страха</label>
+            </div>
+
+            <br class="m-5"/>
+            
+            <div class="form">
+                <input type="radio" asp-for="order" value="up" id="up"/>
+                <label for="up">По возрастанию</label>
+            </div>
+
+            <div class="form">
+                <input type="radio" asp-for="order" value="down" id="down" />
+                <label for="down">По убыванию</label>
+            </div>
+
+            <button  type="submit" class="form detail-button m-5 text-center find-button">ИСКАТЬ</button>
+        </form>
+    </div>
+</div>
+
+
+<button class="toggle-button fixed under control-button">
+    <span>&#9776;</span>
+</button>
+
+<div class="row mt-5">
+    @foreach (var room in Model.Rooms)
+    {
+
+        <div class="col-md-6 col-xl-4">
+            <a asp-page="RoomInfo" asp-route-id="@room.Id">
+                <div class="image-block">
+                    <div class="image">
+                        <img class="room-image" src="~/Files/@room.Name/@room.LogoPath" />
+                    </div>
+
+                    <div class="description">
+                        <p>@room.Description</p>
+                    </div>
+
+
+                </div>
+
+                <div class="room-info pb-3">
+                    <div class="container">
+                        <div class="text-white room-name">
+                            @room.Name.Replace("_"," ")
+                        </div>
+
+                        <div class="room-rating pb-3">
+                            @for (int i = 0; i < room.Rating; i++)
+                            {
+                                <img class="mini-image" src="~/Files/Images/star.png" />
+                            }
+                        </div>
+                        <div class="pb-1">
+                            <img class="mini-image" src="~/Files/Images/town.webp" />
+                            <span class="gray-text">@room.Address</span>
+                        </div>
+                        <div class="pb-1">
+                            <span class="gray-text">Scary rate: </span>
+                            @for (int i = 0; i < room.Scary; i++)
+                            {
+                                <img class="mini-image" src="~/Files/Images/star_gray.png" />
+                            }
+                        </div>
+                        <div>
+                            <span class="gray-text">Complexity: </span>
+                            @for (int i = 0; i < room.Complexity; i++)
+                            {
+                                <img class="mini-image" src="~/Files/Images/star_gray.png" />
+                            }
+                        </div>
+                        <a class="details" asp-page="RoomInfo" asp-route-id="@room.Id">
+
+
+                            <button class="detail-button">Details</button>
+                            
+
+                            <div class="details-info">
+                                <div>@room.MinAge+</div>
+                                <div>
+                                    <img  src="~/Files/Images/lock.webp" />
+                                    @room.Time min
+                                </div>
+                                <div>
+                                    <img src="~/Files/Images/comand.webp"/>
+                                    @room.MinPLayers-@room.MaxPLayers
+                                </div>
+
+                            </div>
+                        </a>
+                    </div>
+                    
+                </div>
+
+
+            </a>
+        </div>
+
+
+    }
+</div>
+
+
+
+<div class="shadow fixed">
+
+</div>
+
+
+
+<script>
+    $(".description").hide();
+
+    $(".image-block").on("mouseenter", function(){
+        $(this).closest(".image-block").find(".description").slideDown();
+    });
+
+    $(".image-block").on("mouseleave", () => {
+        $(".description").slideUp();
+    });
+
+    $(".toggle-button").on("click",ToggleNav);
+
+    $(".shadow").on("click",ToggleNav);
+
+    function ToggleNav(){
+        $(".filter-block").toggle("fast");
+        
+        $(".toggle-button").toggleClass("active");
+        
+        $(".form").toggle("fast");
+
+        $(".shadow").toggle("fast");
+    }
+</script>

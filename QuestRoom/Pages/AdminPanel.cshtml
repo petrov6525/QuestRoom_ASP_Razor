@@ -1,0 +1,87 @@
+﻿@page
+@model QuestRoom.Pages.AdminPanelModel
+@{
+    ViewBag.Title = "Admin Panel";
+}
+
+
+<style>
+    img {
+        width: 100px;
+    }
+
+    button{
+        border-radius:5px;
+        border:2px solid white;
+        color:white;
+        background-color:#212121;
+    }
+
+</style>
+
+
+
+<form asp-page="/AddEdit" method="get" class="text-center">
+    <input type="hidden" name="Id" value="0"/>
+    <button>Add new Room</button>
+</form>
+
+
+
+
+@foreach (var room in Model.Rooms)
+{
+    var Images = Model.Images.Where(i => i.RoomId == room.Id).ToList();
+    <hr />
+    <div class="text-center">
+        <h1 class="d-grid">
+            <div class="row">
+                <div class="col-md-4 text-end">
+                    <form method="get" asp-page="AddEdit">
+                        <input type="hidden" name="id" value="@room.Id" />
+                        <button>Edit</button>
+                    </form>
+                </div>
+
+                <div class="col-md-4 text-white">
+                    @room.Name
+                </div>
+
+                <div class="col-md-4 text-start">
+                    <form method="post" asp-page-handler="Delete">
+                        <input type="hidden" name="id" value="@room.Id" />
+                        <button>Delete</button>
+                    </form>
+                </div>
+            </div>
+        </h1>
+
+        <div>
+            <img src="~/Files/@room.Name/@room?.LogoPath" alt="Logo" />
+        </div>
+
+        <div class="row text-white">
+            <h3 class="text-danger">Description:</h3>
+            <p>@room.Description</p>
+        </div>
+
+        <div class="d-flex justify-content-center">
+            <div class="col-10">
+                <hr>
+                <div class="text-center">
+                    @foreach (var image in Images)
+                    {
+                        <img src="~/Files/@room.Name/@image.Path" alt="Image" />
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+
+    
+
+
+    <hr class="mb-5 mt-5"/>
+}

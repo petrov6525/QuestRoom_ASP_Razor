@@ -1,0 +1,345 @@
+﻿@page
+@model QuestRoom.Pages.AddEditModel
+@{
+}
+
+<style>
+    .phoneDiv {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #Logo, #Phone, #Image {
+        display: none;
+    }
+
+    img {
+        width: 100px;
+    }
+
+    .form-control{
+        background-color: #F0F0F0;
+    }
+
+    form label{
+        color:white;
+    }
+
+    .form-control:focus{
+        background-color:#212121;
+        color:white;
+    }
+
+    .save-button{
+        height:75px;
+        background-color:#212121;
+        border:2px solid white;
+        color:white;
+        font-size:30px;
+        border-radius:10px;
+    }
+
+    .save-button:hover{
+        background-color:red;
+        border-color:red;
+    }
+
+</style>
+
+<form class="d-grid" method="post" enctype="multipart/form-data" onkeydown="KeyDown(event)" id="form1">
+    <input type="hidden" asp-for="Room.Id" />
+    <div class="row">
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="RoomName" class="form-label">Room Name</label>
+                <input type="text" required class="form-control" id="RoomName" asp-for="Room.Name" placeholder="room name">
+            </div>
+
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Email Address</label>
+                <input type="email" required asp-for="Room.Mail" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+            </div>
+
+            <div class="mb-3">
+                <label for="RoomAddress" class="form-label">Room Address</label>
+                <input type="text" required asp-for="Room.Address" class="form-control" id="RoomAddress" placeholder="room address">
+            </div>
+
+            <div class="mb-3">
+                <label for="Company" class="form-label">Company Name</label>
+                <input type="text" required asp-for="Room.Company" class="form-control" id="Company" placeholder="company name">
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="Time" class="form-label">Transist Time</label>
+                <input type="number" required asp-for="Room.Time" class="form-control" min="1" id="Time" placeholder="transist time">
+            </div>
+
+            <div class="mb-3">
+                <label for="Min" class="form-label">Min Players</label>
+                <input type="number" required asp-for="Room.MinPLayers" class="form-control" min="1" id="Min" placeholder="min players">
+            </div>
+
+            <div class="mb-3">
+                <label for="Max" class="form-label">Max Players</label>
+                <input type="number" required asp-for="Room.MaxPLayers" class="form-control" min="1" id="Max" placeholder="max players">
+            </div>
+
+            <div class="mb-3">
+                <label for="Age" class="form-label">Min Age</label>
+                <input type="number" required asp-for="Room.MinAge" class="form-control" min="1" id="Age" placeholder="min age">
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="Rating" class="form-label">Rating</label>
+                <select class="form-control" asp-for="Room.Rating" placeholder="1" id="Rating">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="Scary" class="form-label">Scary</label>
+                <select class="form-control" asp-for="Room.Scary" placeholder="1" id="Scary">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="Complexity" class="form-label">Complexity</label>
+                <select class="form-control" asp-for="Room.Complexity" placeholder="1" id="Complexity">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
+            <div class="mb-3 text-white">
+                <label for="Logo" class="form-label">Logo Image</label>
+
+                @if (Model.Room?.LogoPath == null)
+                {
+                    <input type="file" class="form-control" id="Logo" name="Image" required style="display:inline-block" />
+                }
+                else
+                {
+                    <input type="file" class="form-control" id="Logo" name="Image" />
+                    <div id="logoDiv">
+                        <input type="hidden" id="LogoPath" name="LogoPath" value="@Model.Room.LogoPath"/>
+                        <img src="~/Files/@Model.Room.Name/@Model.Room?.LogoPath" />
+                        <button onclick="DeleteLogo(event)">Delete</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+
+    <div class="mb-3 row">
+        <label for="exampleFormControlTextarea1" class="form-label">Description</label>
+        <textarea class="form-control" required asp-for="Room.Description" id="exampleFormControlTextarea1" rows="3"></textarea>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-6 mb-5">
+            <label class="form-label">Phone Number</label>
+
+            <div id="phonesBlock">
+                @if (Model.Room==null)
+                {
+                    <input type="text" class="form-control mb-3" name="Phone" required style="display:inline-block" />
+                }
+                else
+                {
+                    <div class="phoneDiv mb-3" id="Phone">
+                        <input type="text" class="form-control" name="Phone" />
+                    </div>
+
+                    var phones = Model.context.Phones.Where(p => p.RoomId == Model.Room.Id);
+                    @foreach (var phone in phones)
+                    {
+                        <div class="phoneDiv mb-3">
+                            <input type="text" class="form-control" required name="Phone" value="@phone.Number" />
+                            <button onclick="DeletePhone(event)">Delete</button>
+                        </div>
+
+                    }
+                }
+
+            </div>
+
+            <button class="mt-2" onclick="AddPhone(event)">Add Phone Number</button>
+        </div>
+
+        <div class="col-md-6 text-white">
+            <label class="form-label">Image To Gallery</label>
+            <div id="imagesBlock">
+                @if (Model.Room==null)
+                {
+                    <input type="file" name="Image" class="form-control mb-3" required style="display:inline-block"/>
+                }
+                else
+                {
+                    <div class="imageDiv mb-3" id="Image">
+                        <input type="file" class="form-control" name="Image" />
+                    </div>
+
+                    var images = Model.context.Images.Where(i => i.RoomId == Model.Room.Id);
+
+                    @foreach (var image in images)
+                    {
+                        <div class="imageDiv mb-3">
+                            <input type="hidden" name="ImagePath" value="@image.Path"/>
+                            <img src="~/Files/@Model.Room.Name/@image.Path" />
+                            <button onclick="DeleteImage(event)">Delete</button>
+                        </div>
+                    }
+                }
+
+            </div>
+            <button class="mt-2" onclick="AddImage(event)">Add Image</button>
+        </div>
+    </div>
+
+    <input type="submit" class="mb-3 save-button" value="SAVE" />
+
+</form>
+
+
+<script>
+
+    function KeyDown(e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+            return false;
+        }
+    }
+
+
+    let Logo = document.getElementById("Logo");
+    //console.log(Logo);
+
+
+    function DeleteLogo(e) {
+        e.preventDefault();
+
+        $('#logoDiv').hide();
+        $('#Logo').show();
+
+        let logo = document.getElementById("Logo");
+        logo.toggleAttribute("required");
+
+        console.log(logo);
+
+        let hiddenLogo=document.getElementById("LogoPath");
+        hiddenLogo.value="";
+
+    }
+
+
+
+
+    function AddPhone(e) {
+        e.preventDefault();
+        let phonesBlock = $('#phonesBlock')[0];
+
+        let phoneDiv = document.createElement("div");
+        phoneDiv.className = "phoneDiv mb-3";
+
+        let input = document.createElement("input");
+
+        input.type = "text";
+        input.name = "Phone";
+        input.className = "form-control";
+
+        let button = document.createElement("button");
+        button.innerText = "Delete";
+        button.addEventListener("click", DeletePhone);
+
+        phoneDiv.appendChild(input);
+        phoneDiv.appendChild(button);
+
+        phonesBlock.appendChild(phoneDiv);
+    }
+
+
+    function DeletePhone(e) {
+        e.preventDefault();
+
+        let phonesBlock = $('#phonesBlock')[0];
+
+        let phoneDiv = $(this).closest(".phoneDiv")[0];
+
+        phoneDiv = e.target.parentNode;
+
+
+        phonesBlock.removeChild(phoneDiv);
+
+
+
+        if (phonesBlock.children.length == 1) {
+            $("#Phone").show();
+            let phone = $("input[name='Phone']")[0];
+            phone.toggleAttribute("required");
+        }
+
+    }
+
+    function AddImage(e) {
+        e.preventDefault();
+
+        let imagesBlock = $('#imagesBlock')[0];
+
+        let imageDiv = document.createElement("div");
+        imageDiv.className = "imageDiv mb-3";
+
+        let input = document.createElement("input");
+
+        input.type = "file";
+        input.name = "Image";
+        input.className = "from-control";
+
+        let button = document.createElement("button");
+        button.innerText = "Delete";
+        button.addEventListener("click", DeleteImage);
+
+
+        imageDiv.appendChild(input);
+        imageDiv.appendChild(button);
+
+
+
+        imagesBlock.appendChild(imageDiv);
+    }
+
+
+    function DeleteImage(e) {
+        e.preventDefault();
+
+        let imagesBlock = $('#imagesBlock')[0];
+
+        let imageDiv = e.target.parentNode;
+
+        imagesBlock.removeChild(imageDiv);
+
+        if (imagesBlock.children.length == 1) {
+            $("#Image").show();
+            let image = $(".imageDiv>input[name='Image']")[0];
+            image.toggleAttribute("required");
+        }
+    }
+</script>
